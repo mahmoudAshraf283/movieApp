@@ -7,6 +7,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import Header from "./components/Header";
 import { useState } from "react";
 import  LangContext  from "./context/lang";
+import WatchList from "./pages/WatchList";
 
 function App() {
   const dispatch = useDispatch();
@@ -21,7 +22,6 @@ function App() {
     <>
       <LangContext.Provider value={{ lang, setLang }}>
         <Header />
-
       </LangContext.Provider>
     </>
   );
