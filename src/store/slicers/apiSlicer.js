@@ -6,7 +6,6 @@ export const fetchData = createAsyncThunk(
     const defaultParams = {
       api_key: import.meta.env.VITE_APP_API_KEY,
       region: "EG",
-      language: "ar-EG",
       with_original_language: "ar",
       "primary_release_date.gte": "2020-01-01",
       "primary_release_date.lte": "2025-12-31",

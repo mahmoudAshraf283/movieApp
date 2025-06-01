@@ -6,24 +6,25 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Header from "./components/Header";
 import { useState } from "react";
-import  LangContext  from "./context/lang";
+import LangContext from "./context/lang";
 import WatchList from "./pages/WatchList";
 
 function App() {
   const dispatch = useDispatch();
+  const [lang, setLang] = useState("en");
   const data = useSelector((state) => state.api.data);
   const loading = useSelector((state) => state.api.loading);
   const error = useSelector((state) => state.api.error);
+
   useEffect(() => {
-    dispatch(fetchData({ page: 2 }));
-  }, [dispatch]);
-  const [lang, setLang] = useState("EN");
+    dispatch(fetchData({ language: lang }));
+  }, [dispatch, lang]);
   return (
-    <>
+    <div dir={lang === "ar" ? "rtl" : "ltr"}>
       <LangContext.Provider value={{ lang, setLang }}>
         <Header />
       </LangContext.Provider>
-    </>
+    </div>
   );
 }
 
