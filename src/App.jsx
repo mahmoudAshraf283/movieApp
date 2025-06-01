@@ -1,42 +1,30 @@
-
-import './App.css'
-import {  useEffect } from "react";
+import "./App.css";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "./store/slicers/apiSlicer";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import Header from "./components/Header";
+import { useState } from "react";
+import  LangContext  from "./context/lang";
 
 function App() {
-
-
-
   const dispatch = useDispatch();
   const data = useSelector((state) => state.api.data);
   const loading = useSelector((state) => state.api.loading);
   const error = useSelector((state) => state.api.error);
   useEffect(() => {
-    dispatch(fetchData());
+    dispatch(fetchData({ page: 2 }));
   }, [dispatch]);
-
+  const [lang, setLang] = useState("EN");
   return (
     <>
-    <div>
-      <h1>Movie App</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>Error: {error}</p>
-      ) : (
-        <ul>
-          {data.map((movie) => (
-            <li key={movie.id}>
-              <h2>{movie.title}</h2>
-              <p><img src={import.meta.env.VITE_APP_POSTER_PATH + movie.poster_path} alt="" width={200}/></p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+      <LangContext.Provider value={{ lang, setLang }}>
+        <Header />
+
+      </LangContext.Provider>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

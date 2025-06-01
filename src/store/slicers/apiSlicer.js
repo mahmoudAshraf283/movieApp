@@ -1,19 +1,24 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/config";
-export const fetchData = createAsyncThunk("api/fetchData", async () => {
-  const response = await axiosInstance.get("/discover/movie", {
-    params: {
+export const fetchData = createAsyncThunk(
+  "api/fetchData",
+  async (customParams = {}) => {
+    const defaultParams = {
       api_key: import.meta.env.VITE_APP_API_KEY,
       region: "EG",
       language: "ar-EG",
       with_original_language: "ar",
       "primary_release_date.gte": "2020-01-01",
       "primary_release_date.lte": "2025-12-31",
-    },
-  });
-  return response.data.results;
-});
+    };
 
+    const response = await axiosInstance.get("/discover/movie", {
+      params: { ...defaultParams, ...customParams },
+    });
+
+    return response.data.results;
+  }
+);
 const apiSlice = createSlice({
   name: "api",
   initialState: {
@@ -31,6 +36,7 @@ const apiSlice = createSlice({
       .addCase(fetchData.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload;
+        console.log(action.payload);
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
