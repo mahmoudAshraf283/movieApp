@@ -1,9 +1,10 @@
 import { useState } from "react"
 import WatchListCard from "../components/WatchListCard";
+import { useSelector } from "react-redux";
 
 export default function WatchList (){
-    //For now , won't stay like this
-    const [watchList , setWatchList] = useState ([])
+    //Read from the redux, not a state
+    const watchList = useSelector (state => state.watchList.data)
     return (
         <div className="container">
             <div className="row">
@@ -11,9 +12,9 @@ export default function WatchList (){
             </div>
         {   
             watchList.length > 0 ?
-            <div className="row row-cols-1 row-cols-md-2 g-4 justify-content-between">
+            <div className="row row-cols-1 row-cols-md-2 g-4 justify-content-around">
                 {
-                    watchList.map (() => <WatchListCard></WatchListCard>)
+                    watchList.map ((movie) => <WatchListCard movie={movie}></WatchListCard>)
                 }
             </div>
             :
