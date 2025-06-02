@@ -4,17 +4,10 @@ import Header from "./components/Header";
 import LangContext from "./context/lang";
 import WatchList from "./pages/WatchList";
 import Mainpage from "./pages/Mainpage";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchData } from "./store/slicers/apiSlicer";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 
 function App() {
-  const dispatch = useDispatch();
   const [lang, setLang] = useState("en");
-
-  useEffect(() => {
-    dispatch(fetchData({ language: lang }));
-  }, [dispatch, lang]);
 
   return (
     <div dir={lang === "ar" ? "rtl" : "ltr"}>

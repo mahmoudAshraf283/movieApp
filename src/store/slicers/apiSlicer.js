@@ -3,7 +3,7 @@ import axiosInstance from "../../api/config";
 
 export const fetchData = createAsyncThunk(
   "api/fetchData",
-  async (customParams = {}) => {
+  async ({ type = "movie", customParams = {} }) => {
     const defaultParams = {
       api_key: import.meta.env.VITE_APP_API_KEY,
       region: "EG",
@@ -28,34 +28,18 @@ export const fetchData = createAsyncThunk(
         },
       });
 
-      // Filter results for exact matches
-      const results = response.data.results.filter(movie => {
-        const movieTitle = movie.title.toLowerCase();
+      return response.data.results.filter((item) => {
+        const title = (item.title || item.name || "").toLowerCase();
         const searchQuery = formattedQuery.toLowerCase();
-        
-        // Check for exact match
-        if (movieTitle === searchQuery) {
-          return true;
-        }
-        
-        // Check if movie title starts with the search query
-        if (movieTitle.startsWith(searchQuery)) {
-          return true;
-        }
-        
-        // Check if movie title contains the exact phrase
-        if (movieTitle.includes(searchQuery)) {
-          return true;
-        }
-        
-        return false;
+        return (
+          title === searchQuery ||
+          title.startsWith(searchQuery) ||
+          title.includes(searchQuery)
+        );
       });
-
-      return results;
     }
 
-    // Otherwise use the discover endpoint
-    const response = await axiosInstance.get("/discover/movie", {
+    const response = await axiosInstance.get(`/discover/${type}`, {
       params: { ...defaultParams, ...customParams },
     });
 
