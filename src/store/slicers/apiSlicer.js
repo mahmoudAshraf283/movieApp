@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/config";
+
 export const fetchData = createAsyncThunk(
   "api/fetchData",
   async (customParams = {}) => {
@@ -11,6 +12,49 @@ export const fetchData = createAsyncThunk(
       "primary_release_date.lte": "2025-12-31",
     };
 
+    // If there's a search query, use the search endpoint
+    if (customParams.query) {
+      // Format the query for exact match
+      const formattedQuery = customParams.query.trim();
+      
+      const response = await axiosInstance.get("/search/movie", {
+        params: {
+          ...defaultParams,
+          query: formattedQuery,
+          // Add parameters for more precise matching
+          include_adult: false,
+          language: "en-US",
+          page: 1,
+        },
+      });
+
+      // Filter results for exact matches
+      const results = response.data.results.filter(movie => {
+        const movieTitle = movie.title.toLowerCase();
+        const searchQuery = formattedQuery.toLowerCase();
+        
+        // Check for exact match
+        if (movieTitle === searchQuery) {
+          return true;
+        }
+        
+        // Check if movie title starts with the search query
+        if (movieTitle.startsWith(searchQuery)) {
+          return true;
+        }
+        
+        // Check if movie title contains the exact phrase
+        if (movieTitle.includes(searchQuery)) {
+          return true;
+        }
+        
+        return false;
+      });
+
+      return results;
+    }
+
+    // Otherwise use the discover endpoint
     const response = await axiosInstance.get("/discover/movie", {
       params: { ...defaultParams, ...customParams },
     });
@@ -18,6 +62,7 @@ export const fetchData = createAsyncThunk(
     return response.data.results;
   }
 );
+
 const apiSlice = createSlice({
   name: "api",
   initialState: {
@@ -35,7 +80,6 @@ const apiSlice = createSlice({
       .addCase(fetchData.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload;
-        console.log(action.payload);
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
@@ -43,6 +87,7 @@ const apiSlice = createSlice({
       });
   },
 });
+
 export default apiSlice.reducer;
 
 //to use in components
