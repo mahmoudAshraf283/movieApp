@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import { useDispatch } from "react-redux";
 import { fetchData } from "./store/slicers/apiSlicer";
 import { useEffect, useState } from "react";
+import Details from "./pages/Details";
 
 function App() {
   const [lang, setLang] = useState("en");
@@ -32,6 +33,7 @@ function App() {
           <Route path="/watchlist" element={<WatchList />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/movie/Details/:id" element={<Details />} />
         </Routes>
       </LangContext.Provider>
     </div>
