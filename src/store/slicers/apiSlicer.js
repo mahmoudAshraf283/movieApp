@@ -1,7 +1,3 @@
-// store/slicers/apiSlice.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../api/config";
-
 export const fetchData = createAsyncThunk(
   "api/fetchData",
   async (customParams = {}) => {
@@ -13,12 +9,40 @@ export const fetchData = createAsyncThunk(
       "primary_release_date.lte": "2025-12-31",
     };
 
-    // Fetch the first page to get total pages
+    // If there's a search query, use the search endpoint
+    if (customParams.query) {
+      const formattedQuery = customParams.query.trim();
+
+      const response = await axiosInstance.get("/search/movie", {
+        params: {
+          ...defaultParams,
+          query: formattedQuery,
+          include_adult: false,
+          language: "en-US",
+          page: 1,
+        },
+      });
+
+      // Filter results for better match quality
+      const results = response.data.results.filter((movie) => {
+        const title = movie.title.toLowerCase();
+        const query = formattedQuery.toLowerCase();
+        return (
+          title === query ||
+          title.startsWith(query) ||
+          title.includes(query)
+        );
+      });
+
+      return results;
+    }
+
+    // Otherwise, use discover endpoint (multiple pages)
     const firstResponse = await axiosInstance.get("/discover/movie", {
       params: { ...defaultParams, ...customParams, page: 1 },
     });
 
-    const totalPages = Math.min(firstResponse.data.total_pages, 5); // limit to 5 pages for performance
+    const totalPages = Math.min(firstResponse.data.total_pages, 5); // limit to 5
     const allResults = [...firstResponse.data.results];
 
     // Fetch remaining pages
@@ -32,37 +56,10 @@ export const fetchData = createAsyncThunk(
     }
 
     const responses = await Promise.all(pagePromises);
-    responses.forEach(res => {
+    responses.forEach((res) => {
       allResults.push(...res.data.results);
     });
 
     return allResults;
   }
 );
-
-const apiSlice = createSlice({
-  name: "api",
-  initialState: {
-    data: [],
-    loading: false,
-    error: null,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchData.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchData.fulfilled, (state, action) => {
-        state.loading = false;
-        state.data = action.payload;
-      })
-      .addCase(fetchData.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
-  },
-});
-
-export default apiSlice.reducer;
