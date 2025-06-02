@@ -9,7 +9,6 @@ function Mainpage() {
   const dispatch = useDispatch();
   const { data: movies, loading, error } = useSelector((state) => state.api);
   const { lang } = useContext(LangContext);
-  const [wishlist, setWishlist] = useState({});
   const [type, setType] = useState("movie");
 
   // Map language codes to TMDB language codes
@@ -31,13 +30,6 @@ function Mainpage() {
       }
     }));
   }, [type, lang, dispatch]);
-
-  const toggleWishlist = (id) => {
-    setWishlist((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
 
   if (loading) {
     return (
@@ -84,8 +76,6 @@ function Mainpage() {
       {movies && movies.length > 0 ? (
         <ListCard 
           movies={movies} 
-          wishlist={wishlist} 
-          toggleWishlist={toggleWishlist} 
           type={type}
         />
       ) : (

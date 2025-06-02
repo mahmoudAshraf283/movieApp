@@ -6,14 +6,23 @@ import WatchList from "./pages/WatchList";
 import Mainpage from "./pages/Mainpage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "./store/slicers/apiSlicer";
 import { useEffect, useState } from "react";
 import Details from "./pages/Details";
+import { loadUserWatchlist } from "./store/slicers/watchlistSlice";
 
 function App() {
   const [lang, setLang] = useState("en");
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+
+  // Handle watchlist state when user changes
+  useEffect(() => {
+    if (user) {
+      dispatch(loadUserWatchlist(user.email));
+    }
+  }, [user, dispatch]);
 
   useEffect(() => {
     dispatch(fetchData({

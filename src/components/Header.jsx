@@ -20,6 +20,8 @@ export default function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  const { movies, tvShows } = useSelector((state) => state.watchlist);
+  const watchlistCount = movies.length + tvShows.length;
 
   const handleSelect = (langCode) => {
     console.log(lang);
@@ -51,32 +53,33 @@ export default function Header() {
   };
 
   return (
-    <Navbar expand="lg" className="bg-warning">
-      <Container fluid className="mx-3">
-        <Navbar.Brand href="/" className="me-4">Movie App</Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbarScroll" />
-        <Navbar.Collapse id="navbarScroll" className="justify-content-between">
-          <div className="d-flex justify-content-center" style={{ flex: 1 }}>
-            <Form className="d-flex" style={{ width: '30%' }} onSubmit={handleSearch}>
-              <Form.Control
-                type="search"
-                placeholder="Search for exact movie titles..."
-                className="me-2"
-                aria-label="Search"
-                value={searchQuery}
-                onChange={handleInputChange}
-              />
-              <Button variant="dark" type="submit">Search</Button>
-            </Form>
-          </div>
+    <Navbar bg="light" expand="lg" className="mb-4">
+      <Container>
+        <Navbar.Brand as={Link} to="/">Movie App</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Form className="d-flex mx-auto" onSubmit={handleSearch}>
+            <Form.Control
+              type="search"
+              placeholder="Search"
+              className="me-2"
+              aria-label="Search"
+              value={searchQuery}
+              onChange={handleInputChange}
+            />
+            <Button variant="outline-success" type="submit">Search</Button>
+          </Form>
           <Nav className="d-flex align-items-center">
             {isAuthenticated ? (
               <>
                 <span className="mx-2">Welcome, {user?.username}</span>
-                <Nav.Link href="/watchlist" className="mx-2">
-                  <div className="icon d-flex">
+                <Nav.Link as={Link} to="/watchlist" className="mx-2">
+                  <div className="icon d-flex align-items-center">
                     <i className="bi bi-heart-fill mx-2"></i>
                     <span>Watchlist</span>
+                    {watchlistCount > 0 && (
+                      <span className="badge bg-danger ms-2">{watchlistCount}</span>
+                    )}
                   </div>
                 </Nav.Link>
                 <Button variant="outline-dark" onClick={handleLogout} className="mx-2">

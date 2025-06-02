@@ -1,35 +1,101 @@
-import { useState } from "react"
-import WatchListCard from "../components/WatchListCard";
-import { useSelector } from "react-redux";
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeFromWatchlist } from '../store/slicers/watchlistSlice';
+import { useNavigate } from 'react-router-dom';
 
-export default function WatchList (){
-    //Read from the redux, not a state
-    const watchList = useSelector (state => state.watchList.data)
-    return (
-        <div className="container">
-            <div className="row">
-                <h1 className="col-12 my-3">Watch list</h1>
-            </div>
-        {   
-            watchList.length > 0 ?
-            <div className="row row-cols-1 row-cols-md-2 g-4 justify-content-around">
-                {
-                    watchList.map ((movie) => <WatchListCard movie={movie}></WatchListCard>)
-                }
-            </div>
-            :
-            <>
-                
-                    <div className="row justify-content-center mt-3"><img src="/no_items.svg" alt="" className="img-fluid col-3" /></div>
-                    <div className="row justify-content-center my-3">
-                        <p className="col-8 text-center">No Movies in Watch list</p>
-                    </div>
-                    <div className="row justify-content-center">
-                        <button type="button" className="btn col-4 rounded" style={{backgroundColor:"#FFE353"}}>Back to home</button>
-                    </div>
-            </>
-            
-        }
+function WatchList() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { movies, tvShows } = useSelector((state) => state.watchlist);
+  const [activeTab, setActiveTab] = useState('movies');
+
+  const handleRemove = (id, type) => {
+    dispatch(removeFromWatchlist({ id, type }));
+  };
+
+  const handleItemClick = (id, type) => {
+    navigate(`/movie/Details/${id}`, { state: { type } });
+  };
+
+  const renderItem = (item, type) => (
+    <div
+      key={item.id}
+      className="card mb-3"
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="row g-0">
+        <div className="col-md-2">
+          <img
+            src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+            alt={type === 'movie' ? item.title : item.name}
+            className="img-fluid rounded-start"
+            style={{ height: '100%', objectFit: 'cover' }}
+            onClick={() => handleItemClick(item.id, type)}
+          />
         </div>
-    )
+        <div className="col-md-10">
+          <div className="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <h5 className="card-title" onClick={() => handleItemClick(item.id, type)}>
+                {type === 'movie' ? item.title : item.name}
+              </h5>
+              <p className="card-text">
+                <small className="text-muted">
+                  {type === 'movie' ? item.release_date : item.first_air_date}
+                </small>
+              </p>
+              <p className="card-text">{item.overview}</p>
+            </div>
+            <button
+              className="btn btn-danger"
+              onClick={() => handleRemove(item.id, type)}
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="container mt-4">
+      <h2 className="text-center mb-4">My Watchlist</h2>
+      
+      <div className="btn-group mb-4" role="group">
+        <button
+          className={`btn btn-${activeTab === 'movies' ? 'primary' : 'outline-primary'}`}
+          onClick={() => setActiveTab('movies')}
+        >
+          Movies ({movies.length})
+        </button>
+        <button
+          className={`btn btn-${activeTab === 'tv' ? 'primary' : 'outline-primary'}`}
+          onClick={() => setActiveTab('tv')}
+        >
+          TV Shows ({tvShows.length})
+        </button>
+      </div>
+
+      {activeTab === 'movies' ? (
+        movies.length > 0 ? (
+          movies.map(movie => renderItem(movie, 'movie'))
+        ) : (
+          <div className="text-center">
+            <p>No movies in your watchlist</p>
+          </div>
+        )
+      ) : (
+        tvShows.length > 0 ? (
+          tvShows.map(show => renderItem(show, 'tv'))
+        ) : (
+          <div className="text-center">
+            <p>No TV shows in your watchlist</p>
+          </div>
+        )
+      )}
+    </div>
+  );
 }
+
+export default WatchList;
