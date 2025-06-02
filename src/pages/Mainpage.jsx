@@ -1,7 +1,6 @@
 // pages/Mainpage.js
-import React, { useState,useEffect, useContext } from "react";
-import { useSelector , useDispatch } from "react-redux";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect, useContext } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import ListCard from "../components/ListCards";
 import LangContext from "../context/lang";
 import { fetchData } from "../store/slicers/apiSlicer";
@@ -12,14 +11,13 @@ function Mainpage() {
   const { lang } = useContext(LangContext);
   const [wishlist, setWishlist] = useState({});
   const [type, setType] = useState("movie");
-    useEffect(() => {
+
+  useEffect(() => {
     dispatch(fetchData({
-      type,
-      customParams: {
-        language: lang,
-      },
+      language: lang,
+      type: type
     }));
-  }, [type,  lang, dispatch]);
+  }, [type, lang, dispatch]);
 
   const toggleWishlist = (id) => {
     setWishlist((prev) => ({
@@ -32,7 +30,7 @@ function Mainpage() {
     <div className="container mt-4">
       <div className="text-center mb-4">
         <h5>{type === "movie" ? "Best Movies" : "Best TV Shows"}</h5>
-        <h1>World’s Best {type === "movie" ? "Movies" : "TV Shows"}</h1>
+        <h1>World's Best {type === "movie" ? "Movies" : "TV Shows"}</h1>
 
         <div className="btn-group mt-3" role="group">
           <button
