@@ -1,27 +1,39 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Review({ id }) {
   const [reviews, setReviews] = useState([]);
   const API_KEY = "5fba6bb2cc761bb44d74da68b2bc3e5f";
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(
       `https://api.themoviedb.org/3/movie/${id}/reviews?api_key=${API_KEY}&language=en-US`
     )
-      .then((res) => res.json())
-      .then((data) => setReviews(data.results))
-      .catch((err) => console.error(err));
-  }, [id]);
+      .then((res) => {
+        if (!res.ok) {
+          // Redirect to Not Found page on error (e.g. 404)
+          navigate("/not-found");
+          throw new Error(`HTTP error: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setReviews(data.results);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        navigate("/not-found"); // Fallback for network or parsing errors
+      });
+  }, [id, navigate]);
 
-  if (!reviews.length)
+  if (!reviews)
     return <div className="text-center mt-5">No reviews found.</div>;
-
   return (
-
     <section className="p-3 text-center text-lg-start">
       <div className="row d-flex justify-content-center">
         <div className="col-md-10">
-        <h1>Review</h1>
+          <h1>Review</h1>
           {reviews.map((review) => {
             const avatarPath = review.author_details.avatar_path;
             const isImage =
@@ -78,7 +90,10 @@ function Review({ id }) {
                       )}
                     </div>
                     <div className="col-lg-9 text-start">
-                      <p className="text-muted mb-2" style={{ fontSize: "0.95rem" }}>
+                      <p
+                        className="text-muted mb-2"
+                        style={{ fontSize: "0.95rem" }}
+                      >
                         {review.content.length > 300
                           ? review.content.slice(0, 300) + "..."
                           : review.content}
@@ -86,7 +101,10 @@ function Review({ id }) {
                       <p className="fw-bold mb-1">
                         <strong>{review.author}</strong>
                       </p>
-                      <p className="text-muted mb-0" style={{ fontSize: "0.85rem" }}>
+                      <p
+                        className="text-muted mb-0"
+                        style={{ fontSize: "0.85rem" }}
+                      >
                         Rating:{" "}
                         {review.author_details.rating
                           ? `${review.author_details.rating} / 10`
