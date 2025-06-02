@@ -12,7 +12,6 @@ function Review({ id }) {
     )
       .then((res) => {
         if (!res.ok) {
-          // Redirect to Not Found page on error (e.g. 404)
           navigate("/not-found");
           throw new Error(`HTTP error: ${res.status}`);
         }
@@ -23,7 +22,7 @@ function Review({ id }) {
       })
       .catch((err) => {
         console.error("Fetch error:", err);
-        navigate("/not-found"); // Fallback for network or parsing errors
+        navigate("/not-found");
       });
   }, [id, navigate]);
 

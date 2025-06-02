@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import LangContext from "./context/lang";
 
-import { useDispatch, useSelector, } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "./store/slicers/apiSlicer";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { loadUserWatchlist } from "./store/slicers/watchlistSlice";
