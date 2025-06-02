@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "./store/slicers/apiSlicer";
 import { useEffect, useState } from "react";
 
+
 function App() {
   const dispatch = useDispatch();
   const [lang, setLang] = useState("en");

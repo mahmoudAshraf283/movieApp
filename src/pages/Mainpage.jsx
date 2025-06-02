@@ -1,12 +1,19 @@
-// pages/Mainpage.js
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ListCard from "../components/ListCards";
+import { fetchData } from "../store/slicers/apiSlicer";
 
 function Mainpage() {
+  const dispatch = useDispatch();
   const movies = useSelector((state) => state.api.data);
+  const loading = useSelector((state) => state.api.loading);
+  const error = useSelector((state) => state.api.error);
   const [wishlist, setWishlist] = useState({});
+
+  useEffect(() => {
+    dispatch(fetchData());
+  }, [dispatch]);
 
   const toggleWishlist = (id) => {
     setWishlist((prev) => ({
@@ -22,11 +29,16 @@ function Mainpage() {
         <h1>World’s Best Movies</h1>
       </div>
 
-      <ListCard 
-        movies={movies} 
-        wishlist={wishlist} 
-        toggleWishlist={toggleWishlist} 
-      />
+      {loading && <p>Loading movies...</p>}
+      {error && <p>Error: {error}</p>}
+
+      {!loading && !error && (
+        <ListCard 
+          movies={movies} 
+          wishlist={wishlist} 
+          toggleWishlist={toggleWishlist} 
+        />
+      )}
     </div>
   );
 }
