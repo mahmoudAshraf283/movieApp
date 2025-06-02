@@ -1,3 +1,6 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosInstance from "../../api/config";
+
 export const fetchData = createAsyncThunk(
   "api/fetchData",
   async (customParams = {}) => {
@@ -9,7 +12,6 @@ export const fetchData = createAsyncThunk(
       "primary_release_date.lte": "2025-12-31",
     };
 
-    // If there's a search query, use the search endpoint
     if (customParams.query) {
       const formattedQuery = customParams.query.trim();
 
@@ -23,7 +25,6 @@ export const fetchData = createAsyncThunk(
         },
       });
 
-      // Filter results for better match quality
       const results = response.data.results.filter((movie) => {
         const title = movie.title.toLowerCase();
         const query = formattedQuery.toLowerCase();
@@ -37,15 +38,13 @@ export const fetchData = createAsyncThunk(
       return results;
     }
 
-    // Otherwise, use discover endpoint (multiple pages)
     const firstResponse = await axiosInstance.get("/discover/movie", {
       params: { ...defaultParams, ...customParams, page: 1 },
     });
 
-    const totalPages = Math.min(firstResponse.data.total_pages, 5); // limit to 5
+    const totalPages = Math.min(firstResponse.data.total_pages, 5);
     const allResults = [...firstResponse.data.results];
 
-    // Fetch remaining pages
     const pagePromises = [];
     for (let page = 2; page <= totalPages; page++) {
       pagePromises.push(
@@ -63,3 +62,31 @@ export const fetchData = createAsyncThunk(
     return allResults;
   }
 );
+
+// ✅ THIS MUST BE DEFINED
+const apiSlice = createSlice({
+  name: "api",
+  initialState: {
+    data: [],
+    loading: false,
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  },
+});
+
+export default apiSlice.reducer;
