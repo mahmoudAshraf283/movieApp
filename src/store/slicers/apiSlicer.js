@@ -27,40 +27,22 @@ export const fetchData = createAsyncThunk(
           },
         });
 
-        // Filter results for better matching
-        const results = response.data.results.filter((item) => {
-          const title = (item.title || item.name || "").toLowerCase();
-          const searchQuery = formattedQuery.toLowerCase();
-          
-          // Exact match
-          if (title === searchQuery) return true;
-          
-          // Starts with
-          if (title.startsWith(searchQuery)) return true;
-          
-          // Contains the exact phrase
-          if (title.includes(searchQuery)) return true;
-          
-          return false;
-        });
-
-        return results;
-      } catch (error) {
-        console.error("Search error:", error);
-        throw error;
-      }
-    }
-
-    // Regular discover endpoint
-    try {
-      const response = await axiosInstance.get(`/discover/${type}`, {
-        params: { ...defaultParams, ...customParams },
+      return response.data.results.filter((item) => {
+        const title = (item.title || item.name || "").toLowerCase();
+        const searchQuery = formattedQuery.toLowerCase();
+        return (
+          title === searchQuery ||
+          title.startsWith(searchQuery) ||
+          title.includes(searchQuery)
+        );
       });
-      return response.data.results;
-    } catch (error) {
-      console.error("Discover error:", error);
-      throw error;
     }
+
+    const response = await axiosInstance.get(`/discover/${type}`, {
+      params: { ...defaultParams, ...customParams },
+    });
+
+    return response.data.results;
   }
 );
 
