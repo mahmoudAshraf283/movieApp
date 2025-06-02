@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Button,
   Container,
@@ -8,7 +8,6 @@ import {
   NavDropdown,
 } from "react-bootstrap";
 import LangContext from "../context/lang";
-import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "../store/slicers/apiSlicer";
 import { logout } from "../store/slicers/userSlice";
@@ -17,6 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Header() {
   const { lang, setLang } = useContext(LangContext);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useSelector((state) => state.user);
@@ -51,6 +51,26 @@ export default function Header() {
     dispatch(logout());
     navigate('/login');
   };
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 400); // 400ms debounce
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const trimmedQuery = debouncedQuery.trim();
+    if (trimmedQuery) {
+      dispatch(fetchData({
+        type: "movie",
+        customParams: {
+          query: trimmedQuery,
+          language: lang
+        }
+      }));
+    }
+  }, [debouncedQuery, lang, dispatch]);
 
   return (
     <Navbar bg="light" expand="lg" className="mb-4">
