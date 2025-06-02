@@ -14,36 +14,53 @@ export const fetchData = createAsyncThunk(
 
     // If there's a search query, use the search endpoint
     if (customParams.query) {
-      // Format the query for exact match
       const formattedQuery = customParams.query.trim();
       
-      const response = await axiosInstance.get("/search/movie", {
-        params: {
-          ...defaultParams,
-          query: formattedQuery,
-          // Add parameters for more precise matching
-          include_adult: false,
-          language: "en-US",
-          page: 1,
-        },
-      });
+      try {
+        const response = await axiosInstance.get("/search/movie", {
+          params: {
+            ...defaultParams,
+            query: formattedQuery,
+            include_adult: false,
+            language: customParams.language || "en-US",
+            page: 1,
+          },
+        });
 
-      return response.data.results.filter((item) => {
-        const title = (item.title || item.name || "").toLowerCase();
-        const searchQuery = formattedQuery.toLowerCase();
-        return (
-          title === searchQuery ||
-          title.startsWith(searchQuery) ||
-          title.includes(searchQuery)
-        );
-      });
+        // Filter results for better matching
+        const results = response.data.results.filter((item) => {
+          const title = (item.title || item.name || "").toLowerCase();
+          const searchQuery = formattedQuery.toLowerCase();
+          
+          // Exact match
+          if (title === searchQuery) return true;
+          
+          // Starts with
+          if (title.startsWith(searchQuery)) return true;
+          
+          // Contains the exact phrase
+          if (title.includes(searchQuery)) return true;
+          
+          return false;
+        });
+
+        return results;
+      } catch (error) {
+        console.error("Search error:", error);
+        throw error;
+      }
     }
 
-    const response = await axiosInstance.get(`/discover/${type}`, {
-      params: { ...defaultParams, ...customParams },
-    });
-
-    return response.data.results;
+    // Regular discover endpoint
+    try {
+      const response = await axiosInstance.get(`/discover/${type}`, {
+        params: { ...defaultParams, ...customParams },
+      });
+      return response.data.results;
+    } catch (error) {
+      console.error("Discover error:", error);
+      throw error;
+    }
   }
 );
 
@@ -54,7 +71,12 @@ const apiSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearSearch: (state) => {
+      state.data = [];
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchData.pending, (state) => {
@@ -72,6 +94,7 @@ const apiSlice = createSlice({
   },
 });
 
+export const { clearSearch } = apiSlice.actions;
 export default apiSlice.reducer;
 
 //to use in components

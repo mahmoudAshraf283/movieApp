@@ -12,10 +12,23 @@ function Mainpage() {
   const [wishlist, setWishlist] = useState({});
   const [type, setType] = useState("movie");
 
+  // Map language codes to TMDB language codes
+  const getLanguageCode = (lang) => {
+    const languageMap = {
+      en: "en-US",
+      ar: "ar-SA",
+      fr: "fr-FR",
+      zh: "zh-CN"
+    };
+    return languageMap[lang] || "en-US";
+  };
+
   useEffect(() => {
     dispatch(fetchData({
-      language: lang,
-      type: type
+      type: type,
+      customParams: {
+        language: getLanguageCode(lang)
+      }
     }));
   }, [type, lang, dispatch]);
 
