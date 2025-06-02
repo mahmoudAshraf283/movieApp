@@ -14,6 +14,7 @@ export const fetchData = createAsyncThunk(
 
     if (customParams.query) {
       const formattedQuery = customParams.query.trim();
+<<<<<<< HEAD
 
       const response = await axiosInstance.get("/search/movie", {
         params: {
@@ -24,6 +25,19 @@ export const fetchData = createAsyncThunk(
           page: 1,
         },
       });
+=======
+      
+      try {
+        const response = await axiosInstance.get("/search/movie", {
+          params: {
+            ...defaultParams,
+            query: formattedQuery,
+            include_adult: false,
+            language: customParams.language || "en-US",
+            page: 1,
+          },
+        });
+>>>>>>> ece8fa0cf5f67a19b2b1ac8ca2b7b1d254cb64b7
 
       const results = response.data.results.filter((movie) => {
         const title = movie.title.toLowerCase();
@@ -69,7 +83,12 @@ const apiSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearSearch: (state) => {
+      state.data = [];
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchData.pending, (state) => {
@@ -87,4 +106,5 @@ const apiSlice = createSlice({
   },
 });
 
+export const { clearSearch } = apiSlice.actions;
 export default apiSlice.reducer;

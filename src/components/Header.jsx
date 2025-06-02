@@ -30,7 +30,13 @@ export default function Header() {
     e.preventDefault();
     const trimmedQuery = searchQuery.trim();
     if (trimmedQuery) {
-      dispatch(fetchData({ query: trimmedQuery }));
+      dispatch(fetchData({
+        type: "movie",
+        customParams: {
+          query: trimmedQuery,
+          language: lang
+        }
+      }));
     }
   };
 
