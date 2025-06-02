@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 
-function Detailscard({ id }) {
-  const [movie, setMovie] = useState(null);
-  const API_KEY = "5fba6bb2cc761bb44d74da68b2bc3e5f";
+function Detailscard({ id, type }) {
+  const [item, setItem] = useState(null);
+  const API_KEY = import.meta.env.VITE_APP_API_KEY;
 
   useEffect(() => {
-    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US`)
+    fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&language=en-US`)
       .then((res) => res.json())
-      .then((data) => setMovie(data))
+      .then((data) => setItem(data))
       .catch((err) => console.error(err));
-  }, [id]);
+  }, [id, type, API_KEY]);
 
-  if (!movie) return <div className="text-center mt-5">Loading...</div>;
+  if (!item) return <div className="text-center mt-5">Loading...</div>;
 
-  const starCount = Math.round(movie.vote_average / 2);
+  const starCount = Math.round(item.vote_average / 2);
   const ratingStars = Array.from({ length: 5 }, (_, i) => (
     <span key={i} style={{ color: i < starCount ? "#FFD700" : "#ccc" }}>★</span>
   ));
@@ -23,8 +23,8 @@ function Detailscard({ id }) {
       {/* Poster */}
       <div className="col-md-3">
         <img
-          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-          alt={movie.title}
+          src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+          alt={type === "movie" ? item.title : item.name}
           className="img-fluid"
           style={{
             maxWidth: "100%",
@@ -36,16 +36,16 @@ function Detailscard({ id }) {
         />
       </div>
 
-      {/* Movie Details */}
+      {/* Details */}
       <div className="col-md-8">
-        <h2>{movie.title}</h2>
-        <p>{movie.release_date}</p>
+        <h2>{type === "movie" ? item.title : item.name}</h2>
+        <p>{type === "movie" ? item.release_date : item.first_air_date}</p>
         <h2 className="mb-3">{ratingStars}</h2>
-        <h4>{movie.overview}</h4>
+        <h4>{item.overview}</h4>
 
         {/* Genres */}
         <div className="mb-3">
-          {movie.genres?.map((genre) => (
+          {item.genres?.map((genre) => (
             <span
               key={genre.id}
               style={{
@@ -66,7 +66,7 @@ function Detailscard({ id }) {
 
         {/* Production Companies */}
         <div className="mb-3 d-flex flex-wrap gap-3">
-          {movie.production_companies?.map((company) =>
+          {item.production_companies?.map((company) =>
             company.logo_path ? (
               <img
                 key={company.id}
@@ -74,7 +74,7 @@ function Detailscard({ id }) {
                 alt={company.name}
                 title={company.name}
                 style={{
-                  maxHeight: "100px", // Adjustable size
+                  maxHeight: "100px",
                   objectFit: "contain",
                   padding: "5px",
                   backgroundColor: "#fff",
@@ -87,10 +87,10 @@ function Detailscard({ id }) {
         </div>
 
         {/* IMDb Link Button */}
-        {movie.imdb_id && (
+        {item.imdb_id && (
           <div className="mb-3">
             <a
-              href={`https://www.imdb.com/title/${movie.imdb_id}`}
+              href={`https://www.imdb.com/title/${item.imdb_id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn d-inline-flex align-items-center gap-2"

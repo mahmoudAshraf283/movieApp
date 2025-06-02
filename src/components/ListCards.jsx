@@ -61,7 +61,7 @@ function ListCard({ movies = [] , type }) {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={() => navigate(`/movie/Details/${movie.id}`)}
+              onClick={() => navigate(`/movie/Details/${movie.id}`, { state: { type } })}
             >
               <img
                 className="card-img-top"
