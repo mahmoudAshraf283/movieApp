@@ -7,7 +7,7 @@ import { fetchData } from "../store/slicers/apiSlicer";
 
 function Mainpage() {
   const dispatch = useDispatch();
-  const movies = useSelector((state) => state.api.data);
+  const { data: movies, loading, error } = useSelector((state) => state.api);
   const { lang } = useContext(LangContext);
   const [wishlist, setWishlist] = useState({});
   const [type, setType] = useState("movie");
@@ -39,6 +39,26 @@ function Mainpage() {
     }));
   };
 
+  if (loading) {
+    return (
+      <div className="container mt-4 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mt-4 text-center">
+        <div className="alert alert-danger" role="alert">
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-4">
       <div className="text-center mb-4">
@@ -61,15 +81,16 @@ function Mainpage() {
         </div>
       </div>
 
-      {loading && <p>Loading movies...</p>}
-      {error && <p>Error: {error}</p>}
-
-      {!loading && !error && (
+      {movies && movies.length > 0 ? (
         <ListCard 
           movies={movies} 
           wishlist={wishlist} 
           toggleWishlist={toggleWishlist} 
         />
+      ) : (
+        <div className="text-center">
+          <p>No movies found. Please try a different search or category.</p>
+        </div>
       )}
     </div>
   );
