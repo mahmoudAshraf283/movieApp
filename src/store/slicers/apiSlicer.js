@@ -3,7 +3,7 @@ import axiosInstance from "../../api/config";
 
 export const fetchData = createAsyncThunk(
   "api/fetchData",
-  async (customParams = {}) => {
+  async ({ type = "movie", customParams = {} }) => {
     const defaultParams = {
       api_key: import.meta.env.VITE_APP_API_KEY,
       region: "EG",
@@ -34,8 +34,6 @@ export const fetchData = createAsyncThunk(
           title.includes(query)
         );
       });
-
-      return results;
     }
 
     const firstResponse = await axiosInstance.get("/discover/movie", {

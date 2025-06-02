@@ -12,8 +12,8 @@ import { useEffect, useState } from "react";
 
 
 function App() {
-  const dispatch = useDispatch();
   const [lang, setLang] = useState("en");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchData({ language: lang }));
