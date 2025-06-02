@@ -86,6 +86,7 @@ function Mainpage() {
           movies={movies} 
           wishlist={wishlist} 
           toggleWishlist={toggleWishlist} 
+          type={type}
         />
       ) : (
         <div className="text-center">

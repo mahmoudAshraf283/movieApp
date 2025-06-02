@@ -5,7 +5,7 @@ import { addTowatchlist, removeFromwatchlist } from "../store/slicers/watchlistS
 
 import { useNavigate } from "react-router-dom";
 
-function ListCard({ movies = [] }) {
+function ListCard({ movies = [] , type }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -97,7 +97,7 @@ function ListCard({ movies = [] }) {
                   }}
                   title={movie.title}
                 >
-                  {movie.title}
+                  {type === "movie" ? movie.title : movie.name}
                 </h6>
                 <span
                   style={{
@@ -120,7 +120,7 @@ function ListCard({ movies = [] }) {
                   alignItems: "center",
                 }}
               >
-                <span>{movie.release_date || "N/A"}</span>
+                <span>{type === "movie" ? movie.release_date : movie.first_air_date}</span>
                 <span
                   role="button"
                   onClick={() => toggleWishlist(movie)}
