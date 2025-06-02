@@ -42,6 +42,7 @@ export const fetchData = createAsyncThunk(
     const response = await axiosInstance.get(`/discover/${type}`, {
       params: { ...defaultParams, ...customParams },
     });
+    console.log(response.data.results);
 
     return response.data.results;
   }
