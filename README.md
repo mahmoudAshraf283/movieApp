@@ -1,6 +1,6 @@
 # 🎬 React Movie App
 
-A collaborative full-stack web application that allows users to browse, search, and explore movies and TV shows using data from the TMDB (The Movie Database) API. Built with **React**, this app features a dynamic UI, responsive design, and real-time content updates.
+A collaborative front-end web application that allows users to browse, search, and explore movies and TV shows using data from the TMDB (The Movie Database) API. Built with **React**, this app features a dynamic UI, responsive design, and real-time content updates.
 
 ---
 
